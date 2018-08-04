@@ -9,4 +9,5 @@ setuptools.setup(
     description = 'A dashboard for your AI experiments',
     url = 'https://github.com/tensordash/tensordash',
     packages = setuptools.find_packages(),
+    scripts = ['tensorboard/main.py']
 )
