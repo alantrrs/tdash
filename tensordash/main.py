@@ -1,28 +1,61 @@
 
+from warrant import Cognito
+import configparser
+import os
 
 class Tensordash():
     def __init__(self):
-        # TODO: load config
-        print('load-config')
+        self.poolId = 'us-east-1_fc6CHd37U'
+        self.clientId = '62hrpekqtvh8v5u3u1bipos574'
+        # Load user config
+        self.config = configparser.ConfigParser()
+        self.configpath = '.tensordash.cfg'
+        if os.path.exists(self.configpath):
+            self.config.read(self.configpath)
 
     def push(self, project, filepaths, user=None, password=None):
         self._authenticate(user, password)
         # TODO: Get signed URLs for all files
-        print 'PUSH:', project, filepaths
+        print('PUSH:', project, filepaths)
         # TODO: Upload files from directory to S3 directly
         # TODO: Update DB with outputs
         print("pushing..")
 
     def _authenticate(self, user, password):
-        # TODO: authenticate with server
-        print("Authenticating with server..")
+        try:
+            u = Cognito(self.poolId, self.clientId, username=user)
+            u.authenticate(password=password)
+        except:
+            print('Not authorized. Incorrect username or password.')
+            return (None, None, None)
+        return (u.id_token, u.access_token, u.refresh_token)
 
     def login(self, user, password):
-        isAuth, token = self._authenticate(user, password)
-
+        id_token, access_token, refresh_token = self._authenticate(user, password)
+        if id_token is None:
+            exit(1)
+        # save the config
+        self.config['AUTH'] = {'id_token': id_token,
+                               'access_token': access_token,
+                               'refresh_token': refresh_token}
+        self.config.write(open(self.configpath, 'w'))
+        print('You\'re logged in. Credentials stored.')
 
     def logout(self):
-        # TODO: Remove auth
+        if not ('AUTH' in self.config.sections()):
+            print('You\'re not logged in. All good.')
+            exit(0)
+        # Logout
+        auth = self.config['AUTH']
+        u = Cognito(self.poolId, self.clientId, id_token=auth['id_token'],
+                    access_token=auth['access_token'], refresh_token=auth['refresh_token'])
+        try:
+            u.logout()
+        except:
+            pass
+        # Remove credentials
+        self.config.remove_section('AUTH')
+        self.config.write(open(self.configpath, 'w'))
         print('Credentials successfully removed.')
 
 if __name__ == '__main__':
