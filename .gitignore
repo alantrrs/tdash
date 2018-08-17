@@ -1,3 +1,5 @@
 dist/
 tensordash.egg-info/
 *.cfg
+*.pyc
+tensordash-dev

@@ -2,14 +2,15 @@
 from warrant import Cognito
 import configparser
 import os
-from gql import Client, gql
+from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
-import mimetypes
+from gqlOperations import createExperiment, requestUpload
+import requests
 
 class Tensordash():
     def __init__(self):
-        self.poolId = 'us-east-1_LfXdV62Vn'
-        self.clientId = '6deesjtjflk6aphp4dmt9pl8d9'
+        self.poolId = 'us-east-1_KY8Up2etH'
+        self.clientId = '4piup68kqjt84pdjea1ndhlb20'
         self.graphqlApiUrl = 'https://jgyool6savhb3lyvsxcmdivcw4.appsync-api.us-east-1.amazonaws.com/graphql'
         # Load user config
         self.config = configparser.ConfigParser()
@@ -19,24 +20,49 @@ class Tensordash():
             if 'AUTH' in self.config.sections():
                 self._refresh_auth()
 
-    def push(self, project, filepaths, user=None, password=None):
+    def createExperiment(self, ownerId, projectName, description=None):
+        params = {'input': {
+            'ownerId': ownerId,
+            'projectName': projectName,
+            'description': description
+        }}
+        try:
+            res = self.client.execute(createExperiment, variable_values=params)
+            return res['createExperiment']['id']
+        except Exception as e:
+            # TODO: Parse error correctly
+            print("error", e.message)
+            print("Failed to create new experiment.")
+            exit(1)
+
+
+    def push(self, project, filepaths, user=None, password=None, description=None):
         if user is not None:
             self._authenticate(user, password)
         # TODO: Create new experiment
+        s = project.split('/')
+        ownerId = s[0]
+        projectName = s[1]
+        experimentId = s[2] if len(s) == 3 else self.createExperiment(ownerId, projectName, description=description)
         # Get signed URLs for all files
-        assets = map(lambda asset: {
-            'localUri': asset,
-            'mimeType': mimetypes.guess_type(asset)
-        }, filepaths)
-        query = gql('''
-            query requestAssets($assetsInput: AssetsInput!) {
-                requestAssetsUpload(input: $assetsInput)
-            }
-        ''')
-        params = {'assetsInput': {'assets': assets}}
-        res = self.client.execute(query, variable_values=params)
-        print(res)
+        assets = map(lambda asset: {'localUri': asset}, filepaths)
+        params = {'input': {
+            'ownerId': ownerId,
+            'projectName': projectName,
+            'experimentId': experimentId,
+            'assets': assets
+        }}
+        res = self.client.execute(requestUpload, variable_values=params)
+        print('URLS:', res)
         # TODO: Upload files to S3 directly
+        for asset in res['requestUpload']:
+            print(asset)
+            r = requests.put(asset['putUrl'], data=open(asset['localUri'], 'rb'), headers = {
+                'Content-Type': asset['mimeType'],
+                'x-amz-acl': asset['acl']
+            })
+            print('resp', r.text)
+
         # TODO: Update DB with outputs
 
     def _refresh_auth(self):
