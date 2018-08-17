@@ -45,7 +45,7 @@ class Tensordash():
         projectName = s[1]
         experimentId = s[2] if len(s) == 3 else self.createExperiment(ownerId, projectName, description=description)
         # Get signed URLs for all files
-        assets = map(lambda asset: {'localUri': asset}, filepaths)
+        assets = map(lambda asset: {'localUri': os.path.abspath(asset)}, filepaths)
         params = {'input': {
             'ownerId': ownerId,
             'projectName': projectName,
@@ -53,15 +53,13 @@ class Tensordash():
             'assets': assets
         }}
         res = self.client.execute(requestUpload, variable_values=params)
-        print('URLS:', res)
         # TODO: Upload files to S3 directly
         for asset in res['requestUpload']:
-            print(asset)
-            r = requests.put(asset['putUrl'], data=open(asset['localUri'], 'rb'), headers = {
+            print('Uploading {}'.format(asset['localUri']))
+            requests.put(asset['putUrl'], data=open(asset['localUri'], 'rb'), headers = {
                 'Content-Type': asset['mimeType'],
                 'x-amz-acl': asset['acl']
             })
-            print('resp', r.text)
 
         # TODO: Update DB with outputs
 
