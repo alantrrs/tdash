@@ -8,16 +8,16 @@ jobs:
       - checkout
       - run: python setup.py sdist bdist_wheel
       - persist_to_workspace:
-        root: /tmp
-        paths:
-          - workspace
+          root: /tmp
+          paths:
+            - workspace
   test-release:
     docker:
       - image: circleci/python:2.7
     working_directory: /tmp/workspace
     steps:
       - attach_workspace:
-        at: /tmp
+          at: /tmp
       - run: twine upload -p $PYPI_USERNAME -u $PYPI_PASSWORD --repository-url https://test.pypi.org/legacy/ dist/*
   release:
     docker:
@@ -25,7 +25,7 @@ jobs:
     working_directory: /tmp/workspace
     steps:
       - attach_workspace:
-        at: /tmp
+          at: /tmp
       - run: twine upload -p $PYPI_USERNAME -u $PYPI_PASSWORD --repository-url https://upload.pypi.org/legacy/ dist/*
 
 workflows:
