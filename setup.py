@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name = 'tensordash',
-    version = '0.0.1',
+    version = '0.0.2',
     author = 'tensordash',
     author_email = 'info@tensordash.ai',
     description = 'A dashboard for your AI experiments',
