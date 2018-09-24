@@ -18,6 +18,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp
+      - run: python -m pip install --user --upgrade twine
       - run: twine upload -p $PYPI_USERNAME -u $PYPI_PASSWORD --repository-url https://test.pypi.org/legacy/ dist/*
   release:
     docker:
@@ -26,6 +27,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp
+      - run: python -m pip install --user --upgrade twine
       - run: twine upload -p $PYPI_USERNAME -u $PYPI_PASSWORD --repository-url https://upload.pypi.org/legacy/ dist/*
 
 workflows:
