@@ -15,7 +15,7 @@ class ConfigurationTestCase(TensordashTestCase):
 class LoginTestCase(TensordashTestCase):
     def runTest(self):
        pw = os.getenv('TEST_PASSWORD', 'wrongpass')
-       self.tensordash.login('tests', pw)
+       self.tensordash.login('test1', pw)
 
 # Test push
 # Test logout
