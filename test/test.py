@@ -19,5 +19,9 @@ class LoginTestCase(TensordashTestCase):
 
 # Test push
 # Test logout
+class LogoutTestCase(TensordashTestCase):
+    def runTest(self):
+       self.tensordash.logout()
+
 if __name__ == '__main__':
     unittest.main()

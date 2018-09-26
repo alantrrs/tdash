@@ -171,7 +171,8 @@ class Tensordash():
             pass
         # Remove credentials
         self.config.remove_section('AUTH')
-        self.config.write(open(self.configpath, 'w'))
+        with open(self.configpath, 'w') as f:
+            self.config.write(f)
         print('Credentials successfully removed.')
 
 def cli():
