@@ -6,7 +6,7 @@ jobs:
     working_directory: /tmp/workspace
     steps:
       - checkout
-      - run: python setup.py develop
+      - run: sudo python setup.py develop
       - run: TENSORDASH_API=https://1072qzavta.execute-api.us-east-1.amazonaws.com/dev/config python test/tensordash.py
       - persist_to_workspace:
           root: /tmp
