@@ -5,7 +5,7 @@ from six.moves import input
 import os
 from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
-from gqlOperations import createExperiment, requestUpload
+from tensordash.gqlOperations import createExperiment, requestUpload
 import requests
 import getpass
 
