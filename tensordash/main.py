@@ -35,7 +35,8 @@ class Tensordash():
             self.config.add_section('SERVER')
             for key in config:
                 self.config.set('SERVER', key, config[key])
-            self.config.write(open(self.configpath, 'w'))
+            with open(self.configpath, 'w') as f:
+                self.config.write(f)
             print('Configuration saved to ' + self.configpath)
         except Exception as e:
             print('Error: ' + str(e))
@@ -56,7 +57,8 @@ class Tensordash():
         self.config.add_section('AUTH')
         for key in ['id_token', 'access_token', 'refresh_token']:
             self.config.set('AUTH', key, self.auth[key])
-        self.config.write(open(self.configpath, 'w'))
+        with open(self.configpath, 'w') as f:
+            self.config.write(f)
 
     def createExperiment(self, ownerId, projectName, description=None):
         params = {'input': {
