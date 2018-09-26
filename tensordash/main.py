@@ -12,6 +12,7 @@ import getpass
 class Tensordash():
     def __init__(self):
         # Load user config
+        self.aws_region = 'us-east-1'
         self.config = configparser.ConfigParser()
         self.configpath = os.path.expanduser('~/.tensordash.cfg')
         if os.path.exists(self.configpath):
@@ -107,7 +108,7 @@ class Tensordash():
         auth = self.auth
         u = Cognito(self.userPoolId, self.clientId, id_token=auth['id_token'],
                     access_token=auth['access_token'], refresh_token=auth['refresh_token'],
-                    user_pool_region='us-east-1')
+                    user_pool_region=self.aws_region)
         u.check_token()
         # save config in memory
         self.auth = {
@@ -120,7 +121,8 @@ class Tensordash():
 
     def _authenticate(self, user, password):
         try:
-            u = Cognito(self.userPoolId, self.clientId, username=user)
+            u = Cognito(self.userPoolId, self.clientId, username=user,
+                        user_pool_region=self.aws_region)
             u.authenticate(password=password)
             # save config in memory
             self.auth = {
@@ -159,6 +161,7 @@ class Tensordash():
         # Logout
         auth = self.auth
         u = Cognito(self.userPoolId, self.clientId, id_token=auth['id_token'],
+                    user_pool_region=self.aws_region,
                     access_token=auth['access_token'], refresh_token=auth['refresh_token'])
         try:
             u.logout()
