@@ -8,6 +8,7 @@ setuptools.setup(
     author_email = 'info@tensordash.ai',
     description = 'A dashboard for your AI experiments',
     url = 'https://github.com/tensordash/tensordash',
+    packages = ['tensordash'],
     install_requires = [
         'six',
         'warrant',
