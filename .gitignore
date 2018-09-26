@@ -3,4 +3,4 @@ build/
 tensordash.egg-info/
 *.cfg
 *.pyc
-tensordash-dev
+DEV-ENV/
