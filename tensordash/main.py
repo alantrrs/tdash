@@ -129,7 +129,8 @@ class Tensordash():
             }
             # Setup GraphQL client
             self._update_graphql_client(u.access_token)
-        except:
+        except Exception as e:
+            print(str(e))
             print('Not authorized. Incorrect username or password.')
             exit(1)
 
