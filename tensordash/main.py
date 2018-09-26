@@ -106,7 +106,8 @@ class Tensordash():
         # TODO: Check if the credentials are set
         auth = self.auth
         u = Cognito(self.userPoolId, self.clientId, id_token=auth['id_token'],
-                    access_token=auth['access_token'], refresh_token=auth['refresh_token'])
+                    access_token=auth['access_token'], refresh_token=auth['refresh_token'],
+                    user_pool_region='us-east-1')
         u.check_token()
         # save config in memory
         self.auth = {
