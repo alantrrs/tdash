@@ -95,7 +95,12 @@ class Tensordash():
             'experimentId': experimentId,
             'assets': assets
         }}
-        res = self.client.execute(requestUpload, variable_values=params)
+        try:
+            res = self.client.execute(requestUpload, variable_values=params)
+        except Exception as e:
+            print(str(e))
+            print('Failed to push to experiment')
+            return
         # Upload files to S3 directly
         for asset in res['requestUpload']:
             print('Uploading {}'.format(asset['localUri']))
@@ -103,7 +108,8 @@ class Tensordash():
                 'Content-Type': asset['mimeType'],
                 'x-amz-acl': asset['acl']
             })
-        # TODO: Update experiment ?
+        print('Uploaded files to experiment id: {}'.format(experimentId))
+        print('Check it out at https://tensordash.ai/u/{}/{}'.format(ownerId, projectName))
 
     def _refresh_auth(self):
         # TODO: Check if the credentials are set
